@@ -3,4 +3,4 @@
 	url = https://github.com/dronekit/dronekit-la-testdata
 [submodule "modules/mavlink"]
 	path = modules/mavlink
-	url = git://github.com/ArduPilot/mavlink
+	url = https://github.com/ArduPilot/mavlink.git
