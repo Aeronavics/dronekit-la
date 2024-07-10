@@ -125,8 +125,15 @@ uint8_t Analyzer_MotorBalance::motorcount_for_frame_class(uint8_t value)
     case 4:
         ret = 6;
         break;
+    case 7:
+        ret = 3;
+        break;
+    case 10:
+        // tailsitter
+        ret = 1; // note that this could be incorrect!
+        break;
     default:
-        ::fprintf(stderr, "Umknown frame value (%u)\n", value);
+        ::fprintf(stderr, "Umknown FRAME_CLASS value (%u)\n", value);
         abort();
     }
     return ret;
