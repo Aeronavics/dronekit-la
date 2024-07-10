@@ -17,10 +17,14 @@ void la_log_unsuppress()
 
 void la_log(int priority, const char *format, ...)
 {
-    va_list ap;
-    va_start(ap, format);
-    lalog.log_ap(priority, format, ap);
-    va_end(ap);
+    // ignore debug and info messages
+    if (priority <= 2)
+    {
+        va_list ap;
+        va_start(ap, format);
+        lalog.log_ap(priority, format, ap);
+        va_end(ap);
+    }
 }
 
 
