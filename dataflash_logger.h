@@ -66,6 +66,7 @@ private:
     const char *_log_directory_path;
     int out_fd;
     bool logging_started = false;
+    bool start_logging = false;
 
     void handle_decoded_message(uint64_t T,
                                 mavlink_message_t &m,

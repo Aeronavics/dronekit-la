@@ -232,7 +232,6 @@ bool DataFlash_Logger::logging_start(mavlink_message_t &m,
 {
     sender_system_id = m.sysid;
     sender_component_id = m.compid;
-    sender_arm_status = ARM_STATUS_UNKNOWN;
 
     la_log_unsuppress();
     la_log(LOG_INFO, "mh-dfl: Starting log, target is (%d/%d), I am (%d/%d)",
@@ -242,6 +241,7 @@ bool DataFlash_Logger::logging_start(mavlink_message_t &m,
     }
 
     logging_started = true;
+    start_logging = false;
     return true;
 }
 void DataFlash_Logger::logging_stop()
@@ -269,7 +269,13 @@ void DataFlash_Logger::handle_decoded_message(uint64_t T,
                 logging_stop();
             }
         } else {
-            la_log(LOG_INFO, "Heartbeat received from %u/%u", m.sysid, m.compid);
+            if (sender_arm_status == ARM_STATUS_DISARMED && new_sender_arm_status == ARM_STATUS_ARMED) {
+                // sender has moved from disarmed to armed state; start logging
+                la_log(LOG_INFO, "mh-dfl: arm detected, logging_start");
+                start_logging = true;
+            } else {
+                la_log(LOG_INFO, "Heartbeat received from %u/%u", m.sysid, m.compid);
+            }
         }
 
         sender_arm_status = new_sender_arm_status;
@@ -282,14 +288,14 @@ void DataFlash_Logger::handle_decoded_message(uint64_t T UNUSED,
                                               mavlink_message_t &m,
                                               mavlink_remote_log_data_block_t &msg)
 {
-    if (!logging_started) {
-	if (msg.seqno == 0) {
-	    if (!logging_start(m, msg)) {
-		return;
+    if (!logging_started && start_logging) {
+        if (msg.seqno == 0) {
+            if (!logging_start(m, msg)) {
+                return;
+            }
+        } else {
+	        return;
 	    }
-	} else {
-	    return;
-	}
     }
 
     // we could move this down to the end; that wold mean short-writes
