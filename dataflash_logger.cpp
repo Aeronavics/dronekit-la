@@ -289,13 +289,9 @@ void DataFlash_Logger::handle_decoded_message(uint64_t T UNUSED,
                                               mavlink_remote_log_data_block_t &msg)
 {
     if (!logging_started && start_logging) {
-        if (msg.seqno == 0) {
-            if (!logging_start(m, msg)) {
-                return;
-            }
-        } else {
-	        return;
-	    }
+        if (!logging_start(m, msg)) {
+            return;
+        }
     }
 
     // we could move this down to the end; that wold mean short-writes
